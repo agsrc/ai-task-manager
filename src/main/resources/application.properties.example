@@ -1,0 +1,16 @@
+# --- Database Configuration ---
+quarkus.datasource.db-kind=h2
+# Use a generic path for others to use
+quarkus.datasource.jdbc.url=jdbc:h2:file:./data/tasksdb;DB_CLOSE_DELAY=-1
+quarkus.hibernate-orm.database.generation=drop-and-create
+quarkus.hibernate-orm.log.sql=true
+
+# --- AI Model Configuration (Ollama) ---
+# Default Ollama endpoint
+quarkus.langchain4j.ollama.base-url=http://localhost:11434
+#lightweight model
+quarkus.langchain4j.ollama.chat-model.model-id=phi4-mini
+quarkus.langchain4j.ollama.timeout=60s
+
+# --- AI Tuning ---
+quarkus.langchain4j.ollama.chat-model.num-predict=128
