@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/tasks': 'http://localhost:8080'
+      '/tasks': 'http://127.0.0.1:8080'
     }
   }
 })

@@ -61,7 +61,8 @@ function App() {
   // 1. Fetch Tasks (Like ngOnInit)
   const fetchTasks = async () => {
     const response = await fetch('/tasks');
-    const data = await response.json();
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : [];
     setTasks(data);
   };
 
