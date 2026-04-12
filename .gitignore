@@ -44,4 +44,12 @@ nb-configuration.xml
 # TLS Certificates
 .certs/
 /data/
-/src/main/resources/application.properties
+target/
+*.class
+/src/main/resources/application-local.properties
+
+# Node / React
+node_modules/
+webui/node_modules/
+dist/
+.eslintcache
