@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @ApplicationScoped
@@ -26,6 +27,9 @@ public class TaskService {
 
     @Transactional
     public List<Task> saveAiGeneratedTasks(List<AiTaskDTO> dtos) {
+        if (dtos == null || dtos.isEmpty()) {
+            return Collections.emptyList();
+        }
         return dtos.stream()
                 .map(dto -> {
                     Task entity = new Task();
@@ -68,12 +72,12 @@ public class TaskService {
     }
 
     @Transactional
-    public Task markComplete(Long id) {
+    public Task toggleStatus(Long id) {
         Task task = repository.findById(id);
         if (task == null) {
             throw new NotFoundException("Task not found with ID: " + id);
         }
-        task.completed = true;
+        task.completed = !task.completed;
         return task; // Hibernate automatically flushes changes to the DB when the transaction closes
     }
 

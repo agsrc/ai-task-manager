@@ -1,24 +1,17 @@
 package edu.akshay.controller;
 
-import edu.akshay.dto.AiTaskDTO;
 import edu.akshay.dto.TaskDTO;
 import edu.akshay.entity.Task;
 import edu.akshay.service.TaskArchitect;
 import edu.akshay.util.TaskListWrapper;
 import io.smallrye.common.annotation.RunOnVirtualThread;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import edu.akshay.service.TaskService;
 
+import java.util.Collections;
 import java.util.List;
 
 @Path("/tasks")
@@ -42,9 +35,20 @@ public class TaskResource {
     @RunOnVirtualThread // The AI call is blocking; keep OS threads free!
     public List<Task> createFromAi(String prompt) {
 
+        if (prompt == null || prompt.isBlank()) {
+            throw new BadRequestException("Prompt cannot be empty");
+        }
+
+
         // 1. Ask AI to parse the messy text into a list of Task objects
        // List<TaskDTO> extractedTasks = architect.parse(prompt);
         TaskListWrapper wrapper = architect.parse(prompt);
+
+        if (wrapper == null || wrapper.tasks == null) {
+            // Log this so you can see what the AI actually sent back
+            System.out.println("AI failed to extract tasks from prompt: " + prompt);
+            return Collections.emptyList();
+        }
 
         // 2. Save all extracted tasks to the database
         return service.saveAiGeneratedTasks(wrapper.tasks);
@@ -66,9 +70,9 @@ public class TaskResource {
     }
 
     @PUT
-    @Path("/{id}/complete")
-    public Task markComplete(@PathParam("id") Long id) {
-        return service.markComplete(id);
+    @Path("/{id}/toggle")
+    public Task toggleStatus(@PathParam("id") Long id) {
+        return service.toggleStatus(id);
     }
 
     @DELETE
