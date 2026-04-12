@@ -4,8 +4,9 @@ import edu.akshay.dto.TaskDTO;
 import edu.akshay.entity.Task;
 import edu.akshay.service.TaskArchitect;
 import edu.akshay.util.TaskListWrapper;
-import io.smallrye.common.annotation.RunOnVirtualThread;
+import io.smallrye.common.annotation.Blocking;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -32,7 +33,7 @@ public class TaskResource {
     @POST
     @Path("/ai")
     @Consumes(MediaType.TEXT_PLAIN)
-    @RunOnVirtualThread // The AI call is blocking; keep OS threads free!
+    @Transactional // The AI call is blocking; keep OS threads free!
     public List<Task> createFromAi(String prompt) {
 
         if (prompt == null || prompt.isBlank()) {
@@ -55,7 +56,8 @@ public class TaskResource {
     }
 
     @GET
-    @RunOnVirtualThread
+    // Removed @RunOnVirtualThread to prevent H2 read-locks
+    @Blocking
     public List<TaskDTO> getAll() {
         return service.getAllTasks()
                 .stream()
@@ -64,6 +66,7 @@ public class TaskResource {
     }
 
     @POST
+    @Transactional
     public Response create(Task task) {
         Task created = service.createTask(task);
         return Response.status(Response.Status.CREATED).entity(created).build();
